@@ -1,5 +1,5 @@
 // main.js
-const nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer')
 
 // configure option
 const option = {
@@ -10,14 +10,14 @@ const option = {
     user: process.env.NODE_MAIL_USER,
     pass: process.env.NODE_MAIL_PASSWORD,
   },
-};
+}
 
-const transporter = nodemailer.createTransport(option);
+const transporter = nodemailer.createTransport(option)
 
 // send email
 const sendEmail = async ({ to, subject, text, html, ...rest }) => {
   try {
-    const res = await transporter.verify();
+    const res = await transporter.verify()
     if (res) {
       //config mail
       const mail = {
@@ -33,22 +33,22 @@ const sendEmail = async ({ to, subject, text, html, ...rest }) => {
         html,
         //others
         ...rest,
-      };
+      }
       //Tiến hành gửi email
-      const result = await transporter.sendMail(mail);
-      return { result };
+      const result = await transporter.sendMail(mail)
+      return { result }
     }
-    throw new Error('> An error occurred while sending the email');
+    throw new Error('> An error occurred while sending the email')
   } catch (err) {
-    console.error('ERROR MAILER: ', err);
-    return { err };
+    console.error('ERROR MAILER: ', err)
+    return { err }
   }
-};
+}
 
 const headerHtmlMail = `<h1 style="color: #4c649b; font-size: 48px; border-bottom: solid 2px #ccc;padding-bottom: 10px">
-GENY Courses Eccommerce <br />
-    </h1>`;
-const footerHtmlVerifyMail = `<h1>Cảm ơn./.</h1>`;
+ANH NGỮ SPARKLE <br />
+    </h1>`
+const footerHtmlVerifyMail = `<h1>Cảm ơn./.</h1>`
 
 // gửi mã xác nhận
 const htmlSignupAccount = (token) => {
@@ -56,7 +56,7 @@ const htmlSignupAccount = (token) => {
     ${headerHtmlMail}
     <h2 style="padding: 10px 0; margin-bottom: 10px;">
         Xin chào,<br />
-        Mã xác nhận đăng ký tài khoản cho website GENY Courses Eccommerce của bạn.<br />
+        Mã xác nhận đăng ký tài khoản cho website ANH NGỮ SPARKLE của bạn.<br />
     </h2>
     <h3 style="background: #eee;padding: 10px;">
       <i><b>${token}</b></i>
@@ -67,8 +67,8 @@ const htmlSignupAccount = (token) => {
         Mã chỉ có hiệu lực <i>10 phút </i> từ khi bạn nhận được mail.
     </h3>
   ${footerHtmlVerifyMail}
-  </div>`;
-};
+  </div>`
+}
 
 // gửi mã đổi mật khẩu
 const htmlResetPassword = (token) => {
@@ -76,7 +76,7 @@ const htmlResetPassword = (token) => {
     ${headerHtmlMail}
     <h2 style="padding: 10px 0; margin-bottom: 10px;">
         Xin chào,<br />
-        GENY Courses Eccommerce đã nhận được yêu cầu lấy lại mật khẩu từ bạn.<br />
+        ANH NGỮ SPARKLE đã nhận được yêu cầu lấy lại mật khẩu từ bạn.<br />
         Đừng lo lắng, hãy nhập mã này để khôi phục:
     </h2>
     <h1 style="background: #eee;padding: 10px;">
@@ -88,8 +88,8 @@ const htmlResetPassword = (token) => {
         Mã chỉ có hiệu lực <i>10 phút </i> từ khi bạn nhận được mail.
     </h3>
     ${footerHtmlVerifyMail}
-  </div>`;
-};
+  </div>`
+}
 
 // gửi thông báo đăng nhập sai quá nhiều
 const htmlWarningLogin = () => {
@@ -101,8 +101,8 @@ const htmlWarningLogin = () => {
         Nếu quý khác không nhớ mật khẩu hãy nhấn vào "Quên mật khẩu" để lấy lại mật khẩu<br/>
     </h2>
     <h1>Cảm ơn.</h1>
-  </div>`;
-};
+  </div>`
+}
 
 // gửi mã đổi mật khẩu
 const htmlInvoices = (invoice) => {
@@ -163,7 +163,7 @@ const htmlInvoices = (invoice) => {
                                 Khoá học:
                               </strong>
                             </p>`
-  invoice.detailInvoices.forEach(item => {
+  invoice.detailInvoices.forEach((item) => {
     html += `------------------------------<wbr>------------------------
       <p> <a href="${process.env.FRONTEND_URL}/courses/${item.courseSlug}">${item.courseName}</a><br>
       Giá: ${item.courseCurrentPrice} vnđ<br>
@@ -221,7 +221,7 @@ const htmlInvoices = (invoice) => {
 </div>
 </div>`
   return html
-};
+}
 
 // gửi thông báo không phê duyệt khoá học
 const htmlDenyCourse = (user, course, content) => {
@@ -330,4 +330,4 @@ module.exports = {
   htmlWarningLogin,
   htmlInvoices,
   htmlDenyCourse,
-};
+}
