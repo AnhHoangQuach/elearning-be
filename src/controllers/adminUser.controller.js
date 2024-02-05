@@ -134,6 +134,109 @@ const getAccountAndUsers = async (req, res, next) => {
   }
 }
 
+// fn: lấy thông tin của học sinh
+const getStudents = async (req, res, next) => {
+  try {
+    const { page, limit, sort, exports = 'false' } = req.query
+    let aCountQuery = [
+      {
+        $lookup: {
+          from: 'accounts',
+          localField: 'account',
+          foreignField: '_id',
+          as: 'account',
+        },
+      },
+    ]
+    let aQuery = [
+      {
+        $lookup: {
+          from: 'accounts',
+          localField: 'account',
+          foreignField: '_id',
+          as: 'account',
+        },
+      },
+      {
+        $unwind: '$account',
+      },
+    ]
+    if (sort) {
+      let sortBy = {}
+      let [f, v] = sort.split('-')
+      sortBy[f] = v == 'asc' || v == 1 ? 1 : -1
+      aQuery.push({ $sort: sortBy })
+    }
+
+    // phân trang và bỏ 1 số trường không cần dùng
+    aQuery.push({
+      $project: {
+        'account.password': 0,
+        'account.refreshToken': 0,
+        'account.accessToken': 0,
+        'account.__v': 0,
+        __v: 0,
+      },
+    })
+
+    if (page && limit) {
+      aQuery.push(
+        {
+          $skip: (parseInt(page) - 1) * parseInt(limit),
+        },
+        {
+          $limit: parseInt(limit),
+        }
+      )
+    }
+
+    aCountQuery.push({
+      $count: 'total',
+    })
+    const totalUsers = await UserModel.aggregate(aCountQuery)
+    const total = totalUsers[0]?.total || 0
+    const users = await UserModel.aggregate(aQuery)
+
+    if (exports.toLowerCase().trim() == 'true') {
+      if (page && limit) {
+        aQuery.pop()
+        aQuery.pop()
+      }
+      const dataStudents = await UserModel.aggregate(aQuery)
+      const data = [
+        [`DANH SÁCH THÔNG TIN HỌC SINH`],
+        ['Email', 'Tên', 'Số điện thoại', 'Ngày sinh', 'Giới tính', 'Role'],
+      ]
+      dataStudents.forEach((item) => {
+        data.push([
+          item.account.email,
+          item.fullName,
+          item.phone,
+          item.birthday,
+          item.gender,
+          item.account.role,
+        ])
+      })
+
+      let range1 = { s: { c: 0, r: 0 }, e: { c: 7, r: 0 } } // A1:A13
+      const sheetOptions = { '!merges': [range1] }
+      var buffer = xlsx.build([{ name: 'data', data: data }], { sheetOptions }) // Returns a buffer
+      fs.createWriteStream('./src/public/statistics/danh-sach-hoc-sinh.xlsx').write(buffer)
+      return res.status(200).json({
+        message: 'ok',
+        total,
+        users,
+        file: '/statistics/danh-sach-hoc-sinh.xlsx',
+      })
+    }
+
+    return res.status(200).json({ message: 'ok', total, users })
+  } catch (error) {
+    console.error('> Get student fail :: ', error)
+    return res.status(500).json({ message: 'error' })
+  }
+}
+
 const getTeachers = async (req, res, next) => {
   try {
     const { page, limit, sort, email, active } = req.query
@@ -342,7 +445,7 @@ const postMultiAccountAndUser = async (req, res, next) => {
     let data = xlsx.parse(file.path)[0].data
     // xoá dòng trống
     data = data.filter((row) => row.length != 0)
-    let sucess = 0
+    let success = 0
     let logs = Date.now() + '.txt'
     // lặp tạo tài khoản
     for (let i = 1; i < data.length; i++) {
@@ -367,7 +470,7 @@ const postMultiAccountAndUser = async (req, res, next) => {
                 }
                 if (newUser) {
                   await HistorySearchModel.create({ user: newUser._id })
-                  sucess++
+                  success++
                 }
               }
             } catch (error) {
@@ -551,4 +654,5 @@ module.exports = {
   getStudentsOfTeacher,
   getTeachers,
   getDetailTeacher,
+  getStudents,
 }

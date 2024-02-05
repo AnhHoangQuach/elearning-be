@@ -12,6 +12,14 @@ adminUserApis.get(
   adminUserController.getTeachers
 )
 
+// api: lấy danh sách học sinh
+adminUserApis.get(
+  '/students',
+  passport.jwtAuthentication,
+  passport.isAdminOrTeacher,
+  adminUserController.getStudents
+)
+
 // api: lấy chi tiết 1 tài khoản giáo viên bằng id
 adminUserApis.get(
   '/teachers/:id',
