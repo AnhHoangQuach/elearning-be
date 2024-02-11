@@ -147,6 +147,55 @@ const getStudents = async (req, res, next) => {
           as: 'account',
         },
       },
+      {
+        $unwind: '$account',
+      },
+      {
+        $match: {
+          $or: [{ 'account.role': 'student' }, { 'account.role': 'customer' }],
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'account._id',
+          foreignField: 'account',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $lookup: {
+          from: 'myCourses',
+          localField: '_id',
+          foreignField: 'user',
+          as: 'myCourse',
+        },
+      },
+      {
+        $match: {
+          myCourse: { $exists: true, $ne: [] }, // Filter out documents with empty myCourse array
+        },
+      },
+      {
+        $lookup: {
+          from: 'courses',
+          localField: 'myCourse.course',
+          foreignField: '_id',
+          as: 'course',
+        },
+      },
+      {
+        $group: {
+          _id: '$account._id',
+          account: { $first: '$account' },
+          user: { $first: '$user' },
+          myCourse: { $first: { $arrayElemAt: ['$myCourse', 0] } },
+          course: { $first: { $arrayElemAt: ['$course', 0] } },
+        },
+      },
     ]
     let aQuery = [
       {
@@ -159,6 +208,52 @@ const getStudents = async (req, res, next) => {
       },
       {
         $unwind: '$account',
+      },
+      {
+        $match: {
+          $or: [{ 'account.role': 'student' }, { 'account.role': 'customer' }],
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'account._id',
+          foreignField: 'account',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $lookup: {
+          from: 'myCourses',
+          localField: '_id',
+          foreignField: 'user',
+          as: 'myCourse',
+        },
+      },
+      {
+        $match: {
+          myCourse: { $exists: true, $ne: [] }, // Filter out documents with empty myCourse array
+        },
+      },
+      {
+        $lookup: {
+          from: 'courses',
+          localField: 'myCourse.course',
+          foreignField: '_id',
+          as: 'course',
+        },
+      },
+      {
+        $group: {
+          _id: '$account._id',
+          account: { $first: '$account' },
+          user: { $first: '$user' },
+          myCourse: { $first: { $arrayElemAt: ['$myCourse', 0] } },
+          course: { $first: { $arrayElemAt: ['$course', 0] } },
+        },
       },
     ]
     if (sort) {
