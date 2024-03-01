@@ -1,8 +1,6 @@
 const AccountModel = require('../models/users/account.model')
 const UserModel = require('../models/users/user.model')
 const jwt = require('jsonwebtoken')
-var GooglePlusStrategy = require('passport-google-token').Strategy
-const passport = require('passport')
 
 // authentication with JWT
 const jwtAuthentication = async (req, res, next) => {
@@ -159,41 +157,6 @@ const authPage = (permissions) => {
     next()
   }
 }
-
-passport.use(
-  new GooglePlusStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    },
-    async function (accessToken, refreshToken, profile, done) {
-      try {
-        const { id, name } = profile
-        const { familyName, givenName } = name
-        const email = profile.emails[0].value
-        var user = null,
-          account = null
-        // check exist email account
-        account = await AccountModel.findOne({ email })
-        if (account) {
-          user = await UserModel.findOne({ account: account._id })
-        } else {
-          // tạo account và user tương ứng
-          account = await AccountModel.create({ email, password: email })
-          user = await UserModel.create({
-            account: account._id,
-            fullName: familyName + ' ' + givenName,
-          })
-        }
-        // req.user = account, req.authInfo = user
-        done(null, user, account)
-      } catch (error) {
-        console.log(error)
-        done(error, false)
-      }
-    }
-  )
-)
 
 module.exports = {
   jwtAuthentication,
