@@ -491,6 +491,11 @@
   dependencies:
     "tslib" "^2.3.1"
 
+"@ffprobe-installer/darwin-arm64@5.0.1":
+  "integrity" "sha512-vwNCNjokH8hfkbl6m95zICHwkSzhEvDC3GVBcUp5HX8+4wsX10SP3B+bGur7XUzTIZ4cQpgJmEIAx6TUwRepMg=="
+  "resolved" "https://registry.npmjs.org/@ffprobe-installer/darwin-arm64/-/darwin-arm64-5.0.1.tgz"
+  "version" "5.0.1"
+
 "@ffprobe-installer/ffprobe@^1.4.1":
   "integrity" "sha512-3WJvxU0f4d7IOZdzoVCAj9fYtiQNC6E0521FJFe9iP5Ej8auTXU7TsrUzIAG1CydeQI+BnM3vGog92SCcF9KtA=="
   "resolved" "https://registry.npmjs.org/@ffprobe-installer/ffprobe/-/ffprobe-1.4.1.tgz"
@@ -504,11 +509,6 @@
     "@ffprobe-installer/linux-x64" "5.0.0"
     "@ffprobe-installer/win32-ia32" "5.0.0"
     "@ffprobe-installer/win32-x64" "5.0.0"
-
-"@ffprobe-installer/win32-x64@5.0.0":
-  "integrity" "sha512-P4ZMRFxVMnfMsOyTfBM/+nkTodLeOUfXNPo+X1bKEWBiZxRErqX/IHS5sLA0yAH8XmtKZcL7Cu6M26ztGcQYxw=="
-  "resolved" "https://registry.npmjs.org/@ffprobe-installer/win32-x64/-/win32-x64-5.0.0.tgz"
-  "version" "5.0.0"
 
 "@google-cloud/video-intelligence@^3.4.1":
   "integrity" "sha512-1s7LWOwqL8DgLZd9pjnVbKylK4CbTih3IGXfbOO0MxAl2eIpHu5Uuo+rQpbp0WulR2hsIznRr7KOVW4QLVUXAw=="
@@ -611,7 +611,7 @@
   "resolved" "https://registry.npmjs.org/@redis/bloom/-/bloom-1.2.0.tgz"
   "version" "1.2.0"
 
-"@redis/client@1.5.12":
+"@redis/client@^1.0.0", "@redis/client@1.5.12":
   "integrity" "sha512-/ZjE18HRzMd80eXIIUIPcH81UoZpwulbo8FmbElrjPqH0QC0SeIKu1BOU49bO5trM5g895kAjhvalt5h77q+4A=="
   "resolved" "https://registry.npmjs.org/@redis/client/-/client-1.5.12.tgz"
   "version" "1.5.12"
@@ -1788,7 +1788,7 @@
   "resolved" "https://registry.npmjs.org/exit-on-epipe/-/exit-on-epipe-1.0.1.tgz"
   "version" "1.0.1"
 
-"express@^4.17.3":
+"express@^4.17.3", "express@>=4.0.0 || >=5.0.0-beta":
   "integrity" "sha512-5/PsL6iGPdfQ/lKM1UuielYgv3BUoJfz1aUwU9vHZ+J7gyvwdQXFEBIEIaxeGf0GIcreATNyBExtalisDbuMqQ=="
   "resolved" "https://registry.npmjs.org/express/-/express-4.18.2.tgz"
   "version" "4.18.2"
@@ -1910,6 +1910,11 @@
   "integrity" "sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw=="
   "resolved" "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz"
   "version" "1.0.0"
+
+"fsevents@~2.3.2":
+  "integrity" "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw=="
+  "resolved" "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz"
+  "version" "2.3.3"
 
 "function-bind@^1.1.2":
   "integrity" "sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA=="
@@ -2452,7 +2457,7 @@
   dependencies:
     "lodash._reinterpolate" "^3.0.0"
 
-"lodash@^4.17.20", "lodash@^4.17.21":
+"lodash@^4.17.20", "lodash@^4.17.21", "lodash@>=4.0":
   "integrity" "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="
   "resolved" "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz"
   "version" "4.17.21"
