@@ -7,6 +7,7 @@ var fs = require('fs')
 const MyCourseModel = require('../models/users/myCourse.model')
 const mongoose = require('mongoose')
 const TeacherModel = require('../models/users/teacher.model')
+const CourseModel = require('../models/courses/course.model')
 const ObjectId = mongoose.Types.ObjectId
 
 function ValidateEmail(mail) {
@@ -487,13 +488,59 @@ const getDetailTeacher = async (req, res, next) => {
 const getDetailAccountAndUser = async (req, res, next) => {
   try {
     const { id } = req.params
-    const user = await UserModel.findById(id)
-      .populate('account', '-__v -password -refreshToken -accessToken')
-      .lean()
+    let aQuery = [
+      { $match: { _id: ObjectId(id) } },
+      {
+        $lookup: {
+          from: 'accounts',
+          localField: 'account',
+          foreignField: '_id',
+          as: 'account',
+        },
+      },
+      {
+        $unwind: '$account',
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'account._id',
+          foreignField: 'account',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $lookup: {
+          from: 'myCourses',
+          localField: '_id',
+          foreignField: 'user',
+          as: 'myCourse',
+        },
+      },
+      {
+        $unwind: '$myCourse',
+      },
+      {
+        $project: {
+          'account.password': 0,
+          'account.refreshToken': 0,
+          'account.accessToken': 0,
+          'account.__v': 0,
+          __v: 0,
+        },
+      },
+    ]
+    const user = (await UserModel.aggregate(aQuery))[0]
+    if (!user) {
+      return res.status(404).json({ message: 'Not found' })
+    }
     return res.status(200).json({ message: 'ok', user })
   } catch (error) {
-    console.error('> Get detail account user :: ', error)
-    return res.status(500).json({ message: 'error' })
+    console.log('> Get detail user fail :: ', error)
+    return res.status(500).json({ message: error.message })
   }
 }
 
@@ -501,7 +548,17 @@ const getDetailAccountAndUser = async (req, res, next) => {
 // POST /api/admin/users
 const postAccountAndUser = async (req, res, next) => {
   try {
-    const { email, password, role = 'student', fullName, birthday, gender, phone } = req.body
+    const {
+      email,
+      password,
+      role = 'student',
+      fullName,
+      birthday,
+      gender,
+      phone,
+      isPaid,
+      courseId,
+    } = req.body
 
     if (ValidateEmail(email)) {
       const newAcc = await AccountModel.create({
@@ -518,6 +575,13 @@ const postAccountAndUser = async (req, res, next) => {
           phone,
         })
         if (newUser) {
+          const course = await CourseModel.findById(courseId).lean()
+
+          if (!course) {
+            return res.status(404).json({ message: 'Not found' })
+          }
+
+          await MyCourseModel.create({ user: newUser, course, isPaid })
           await HistorySearchModel.create({ user: newUser._id })
         }
         if (newUser && role == 'teacher') {
@@ -618,7 +682,7 @@ const postMultiAccountAndUser = async (req, res, next) => {
 const putAccountAndUser = async (req, res, next) => {
   try {
     const { id } = req.params
-    var { user, account } = req.body
+    var { user, account, courseId, isPaid } = req.body
     // check input tránh hacker
     if (user && user.account) {
       delete user.account
@@ -646,6 +710,10 @@ const putAccountAndUser = async (req, res, next) => {
     }
     if (user !== null && typeof user === 'object') {
       await UserModel.updateOne({ _id: id }, user)
+    }
+    if (courseId) {
+      let course = await CourseModel.findById(courseId)
+      await MyCourseModel.updateOne({ user: id }, { course, isPaid })
     }
     return res.status(200).json({ message: 'update ok' })
   } catch (error) {

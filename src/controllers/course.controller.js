@@ -194,7 +194,7 @@ const putCourse = async (req, res, next) => {
 const getCourses = async (req, res, next) => {
     try {
         const { user } = req
-        let { page = 1, limit = 10, sort, name, category, min, max, hashtags, rating, level, publish, status, author } = req.query
+        let { page = 1, limit = 100, sort, name, category, min, max, hashtags, rating, level, publish, status, author } = req.query
         const nSkip = (parseInt(page) - 1) * parseInt(limit)
         let searchKey = await didYouMean(name) || null
         let aCountQuery = [
