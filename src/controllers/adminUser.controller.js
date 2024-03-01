@@ -153,6 +153,7 @@ const getStudents = async (req, res, next) => {
       {
         $match: {
           $or: [{ 'account.role': 'student' }, { 'account.role': 'customer' }],
+          'account.isActive': true,
         },
       },
       {
@@ -212,6 +213,7 @@ const getStudents = async (req, res, next) => {
       {
         $match: {
           $or: [{ 'account.role': 'student' }, { 'account.role': 'customer' }],
+          'account.isActive': true,
         },
       },
       {
