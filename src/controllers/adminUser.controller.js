@@ -556,8 +556,8 @@ const postAccountAndUser = async (req, res, next) => {
       birthday,
       gender,
       phone,
-      isPaid,
       courseId,
+      progressPaid,
     } = req.body
 
     if (ValidateEmail(email)) {
@@ -575,17 +575,16 @@ const postAccountAndUser = async (req, res, next) => {
           phone,
         })
         if (newUser) {
-          const course = await CourseModel.findById(courseId).lean()
-
-          if (!course) {
-            return res.status(404).json({ message: 'Not found' })
-          }
-
-          await MyCourseModel.create({ user: newUser, course, isPaid })
           await HistorySearchModel.create({ user: newUser._id })
         }
         if (newUser && role == 'teacher') {
           await TeacherModel.create({ user: newUser._id, isVerified: true })
+        } else if (newUser && role === 'student') {
+          const course = await CourseModel.findById(courseId).lean()
+          if (!course) {
+            return res.status(404).json({ message: 'Not found' })
+          }
+          await MyCourseModel.create({ user: newUser, course, progressPaid })
         }
       }
       return res.status(201).json({ message: 'ok' })
@@ -682,7 +681,7 @@ const postMultiAccountAndUser = async (req, res, next) => {
 const putAccountAndUser = async (req, res, next) => {
   try {
     const { id } = req.params
-    var { user, account, courseId, isPaid } = req.body
+    var { user, account, courseId, progressPaid } = req.body
     // check input tránh hacker
     if (user && user.account) {
       delete user.account
@@ -713,7 +712,7 @@ const putAccountAndUser = async (req, res, next) => {
     }
     if (courseId) {
       let course = await CourseModel.findById(courseId)
-      await MyCourseModel.updateOne({ user: id }, { course, isPaid })
+      await MyCourseModel.updateOne({ user: id }, { course, progressPaid })
     }
     return res.status(200).json({ message: 'update ok' })
   } catch (error) {

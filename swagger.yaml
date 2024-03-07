@@ -446,30 +446,6 @@ components:
         content:
           type: string
 
-    Comment:
-      type: object
-      properties:
-        lesson:
-          $ref: "#/components/schemas/Lesson"
-        author:
-          $ref: "#/components/schemas/User"
-        content:
-          type: string
-        replies:
-          type: array
-          items:
-            type: object
-            properties:
-              lesson:
-                $ref: "#/components/schemas/Lesson"
-              author:
-                $ref: "#/components/schemas/User"
-              content:
-                type: string
-              createdAt:
-                type: string
- 
-
     Chapter:
       type: object
       properties:
@@ -4093,78 +4069,4 @@ paths:
         401:
           description: "Unauthorize"
         500:
-          description: "SERVER ERROR"   
-   
-  /comment:
-    post:
-      tags:
-        - comment
-      summary: tạo comment trong lesson
-      description: ""
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                lessonId:
-                  type: string
-                content:
-                  type: string
-                commentId:
-                  type: string
-      responses:
-        200:
-          description: "ok"
-        401:
-          description: "Unauthorize"
-        500:
-          description: "SERVER ERROR"   
-  /comment/{id}:  
-    delete:
-      tags:
-        - comment
-      summary: tạo comment trong lesson
-      description: ""
-      parameters:
-        - name: id
-          in: path
-          schema:
-            type: string
-          required: true
-      responses:
-        200:
-          description: "ok"
-        401:
-          description: "Unauthorize"
-        500:
-          description: "SERVER ERROR"   
-    put:
-      tags:
-        - comment
-      summary: tạo comment trong lesson
-      description: ""
-      parameters:
-        - name: id
-          in: path
-          schema:
-            type: string
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                parentCommentId:
-                  type: string
-                content:
-                  type: string
-      responses:
-        200:
-          description: "ok"
-        401:
-          description: "Unauthorize"
-        500:
-          description: "SERVER ERROR"   
-     
+          description: "SERVER ERROR"

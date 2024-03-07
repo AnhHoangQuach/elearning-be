@@ -30,9 +30,16 @@ const myCourseSchema = new Schema(
       type: String,
       default: null,
     },
-    isPaid: {
-      type: Boolean,
-      default: false,
+    progressPaid: {
+      type: [Object],
+      datePaid: {
+        type: Date,
+        default: Date.now,
+      },
+      amount: {
+        type: Number,
+        default: 0,
+      },
     },
   },
   { timestamps: true }
