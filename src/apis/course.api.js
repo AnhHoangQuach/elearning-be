@@ -28,9 +28,6 @@ courseApis.get('/:slug/related', passport.jwtAuthenticationOrNull, courseControl
 // api cập nhật khoá học theo slug
 courseApis.put('/:slug', passport.jwtAuthentication, accessControl.grantAccess('updateOwn', 'course'), courseController.putCourse)
 
-// api lấy thông tin đánh giá của khoá học
-courseApis.get('/:slug/rate', passport.jwtAuthenticationOrNull, courseController.getRates)
-
 // api: xoá khoá học
 courseApis.delete('/:slug', passport.jwtAuthentication, courseController.deleteCourse)
 

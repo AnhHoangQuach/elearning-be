@@ -4,7 +4,6 @@ const mongoose = require('mongoose')
 const ObjectId = mongoose.Types.ObjectId
 const _ = require('lodash')
 const LessonModel = require('../models/courses/lesson.model')
-const RateModel = require('../models/courses/rate.model')
 const ChapterModel = require('../models/courses/chapter.model')
 
 // fn: lấy danh sách khoá học đã mua và phân trang
@@ -205,8 +204,6 @@ const getMyCourses = async (req, res, next) => {
     const count = await MyCourseModel.aggregate(countQuery)
     let total = count[0]?.total || 0
 
-    // hiện đánh giá nếu user đã đánh giá
-    const userRatings = await RateModel.find({ author: user }).select('rate content course author')
     // tính phần trăm hoàn thành khoá học và hiện đánh giá nếu có
     var result = myCourses.map((item) => {
       // tính tiến độ % hoàn thành khoá học
@@ -217,12 +214,6 @@ const getMyCourses = async (req, res, next) => {
       let mau = 0
       item.chapters.forEach((chapter) => {
         mau += chapter.lessons.length
-      })
-      // thêm đánh giá nếu có
-      userRatings.forEach((rate) => {
-        if (JSON.stringify(rate.course) == JSON.stringify(item.course._id)) {
-          item.rating = rate
-        }
       })
       delete item.progress
       delete item.chapters
@@ -347,13 +338,8 @@ const getMyCourse = async (req, res, next) => {
     ]
 
     const myCourse = await MyCourseModel.aggregate(query)
-    const myRating = await RateModel.findOne({
-      author: user,
-      course: myCourse[0].course._id,
-    }).select('rate content')
     // tính phần trăm hoàn thành khoá học và chèn timeline vào lesson
     var result = myCourse.map((item) => {
-      item.rating = myRating
       let tu = 0
       item.progress.forEach((i) => {
         i.complete ? tu++ : (tu += 0)
