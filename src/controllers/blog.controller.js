@@ -22,7 +22,7 @@ const createBlog = async (req, res, next) => {
 
 const deleteBlog = async (req, res, next) => {
     try {
-        const result = await BlogModel.delete({ _id: req.params.id })
+        const result = await BlogModel.deleteOne({ _id: req.params.id })
         res.status(200).json({ message: 'update ok', result })
     } catch (error) {
         console.log(error);
