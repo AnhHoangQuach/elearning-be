@@ -561,11 +561,20 @@ const postAccountAndUser = async (req, res, next) => {
     } = req.body
 
     if (ValidateEmail(email)) {
+      let course;
+      if (role === 'student') {
+        course = await CourseModel.findById(courseId).lean()
+        if (!course) {
+          return res.status(404).json({ message: 'Not found' })
+        }
+      }
+
       const newAcc = await AccountModel.create({
         email: email.toLowerCase().trim(),
         password: password.trim(),
         role,
       })
+
       if (newAcc) {
         const newUser = await UserModel.create({
           fullName,
@@ -574,19 +583,11 @@ const postAccountAndUser = async (req, res, next) => {
           gender,
           phone,
         })
-        if (newUser) {
-          await HistorySearchModel.create({ user: newUser._id })
-        }
-        if (newUser && role == 'teacher') {
-          await TeacherModel.create({ user: newUser._id, isVerified: true })
-        } else if (newUser && role === 'student') {
-          const course = await CourseModel.findById(courseId).lean()
-          if (!course) {
-            return res.status(404).json({ message: 'Not found' })
-          }
-          await MyCourseModel.create({ user: newUser, course, progressPaid })
-        }
+        if (newUser) await HistorySearchModel.create({ user: newUser._id })
+        if (newUser && role == 'teacher')  await TeacherModel.create({ user: newUser._id, isVerified: true })
+        else if (newUser && role === 'student')  await MyCourseModel.create({ user: newUser, course, progressPaid })
       }
+    
       return res.status(201).json({ message: 'ok' })
     }
     return res.status(400).json({ message: 'email không hợp lệ' })
