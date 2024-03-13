@@ -729,10 +729,9 @@ const deleteAccountAndUser = async (req, res, next) => {
     const { id } = req.params
 
     let user = await UserModel.findById(id).lean()
-    // await UserModel.deleteOne({ _id: id })
-    // await AccountModel.deleteOne({ _id: user.account })
-    await AccountModel.updateOne({ _id: user.account }, { isActive: false })
-    return res.status(200).json({ message: 'ok! isActive : false' })
+    await UserModel.deleteOne({ _id: id })
+    await AccountModel.deleteOne({ _id: user.account })
+    return res.status(200).json({ message: 'ok!' })
   } catch (error) {
     console.log('> Delete account user fail', error)
     return res.status(500).json({ message: 'error' })
@@ -744,7 +743,7 @@ const deleteMultiAccountAndUser = async (req, res, next) => {
   try {
     const { ids } = req.body
     let logs = ''
-    let sucess = 0
+    let success = 0
     for (let i = 0; i < ids.length; i++) {
       let id = ids[i]
       let user = {}
@@ -757,20 +756,18 @@ const deleteMultiAccountAndUser = async (req, res, next) => {
         logs += `Lỗi: index:${i}. id '${id}' không tồn tại \n`
         continue
       }
-      const { modifiedCount } = await AccountModel.updateOne(
-        { _id: user.account },
-        { isActive: false }
-      )
+      await UserModel.deleteOne({ _id: id })
+      await AccountModel.deleteOne({ _id: user.account })
       if (modifiedCount != 1) {
         logs += `Lỗi: index:${i}. id '${id}' giá trị cập nhật không khác giá trị ban đầu`
         continue
       }
-      sucess++
+      success++
     }
     if (logs == '') {
-      return res.status(200).json({ message: `update ${sucess}/${ids.length} oke` })
+      return res.status(200).json({ message: `update ${success}/${ids.length} oke` })
     }
-    return res.status(200).json({ message: `update ${sucess}/${ids.length} oke`, error: logs })
+    return res.status(200).json({ message: `update ${success}/${ids.length} oke`, error: logs })
   } catch (error) {
     console.log('> Delete many account fail:', error)
     return res.status(500).json({ message: error })

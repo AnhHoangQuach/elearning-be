@@ -2,7 +2,7 @@ const BlogModel = require('../models/blog.model')
 
 const fetchBlogs = async (req, res, next) => {
     try {
-        var result = await BlogModel.find()
+        var result = await BlogModel.find({ title: { $regex: req.query.title || '', $options: 'i' }})
         return res.status(200).json({ message: 'ok', result })
     } catch (error) {
         console.log(error);
